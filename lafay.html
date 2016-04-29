@@ -1,0 +1,222 @@
+<html>
+<head>
+
+<style type="text/css">
+
+.button-class {
+    height: 100px;
+    width: 100px;
+}
+
+</style>
+
+<script>
+
+var restPeriod = 25;
+
+var workout = [
+    {
+        id: "refoflafay",
+        name: "dips",
+        sets: 6,
+        repetitions: 5,
+        rest: restPeriod,
+        next: 25
+    },
+    {
+        id: "refoflafay",
+        name: "chair pressups",
+        sets: 6,
+        repetitions: 6,
+        rest: restPeriod,
+        next: 25
+    },
+    {
+        id: "refoflafay",
+        name: "raised feet, wide arm pressups",
+        sets: 6,
+        repetitions: 6,
+        rest: restPeriod,
+        next: 180
+    },
+    {
+        id: "refoflafay",
+        name: "pull ups",
+        sets: 6,
+        repetitions: 5,
+        rest: restPeriod,
+        next: 180
+    },
+    {
+        id: "refoflafay",
+        name: "door hang squats (right)",
+        sets: 6,
+        repetitions: 5,
+        rest: restPeriod,
+        next: 180
+    }
+    ,
+    {
+        id: "refoflafay",
+        name: "door hang squats (left)",
+        sets: 6,
+        repetitions: 5,
+        rest: restPeriod,
+        next: 180
+    },
+    {
+        id: "refoflafay",
+        name: "jump squats",
+        sets: 6,
+        repetitions: 5,
+        rest: restPeriod,
+        next: 180
+    },
+    {
+        id: "refoflafay",
+        name: "sit ups",
+        sets: 6,
+        repetitions: 10,
+        rest: restPeriod,
+        next: 180
+    },
+    {
+        id: "refoflafay",
+        name: "hanging knee raise",
+        sets: 6,
+        repetitions: 1,
+        rest: restPeriod,
+        next: 90
+    },
+    {
+        id: "refoflafay",
+        name: "wall press",
+        sets: 4,
+        repetitions: 15,
+        rest: 25,
+        next: 0
+    }
+];
+
+var currentRoutine = {
+    routineCount: 0,
+    routine: {},
+    set: 0,
+};
+
+var inRest = false;
+
+var interval;
+
+/*
+Starts the whole thing off.
+*/
+function doWorkout(){
+    currentRoutine.routine = workout[currentRoutine.routineCount];
+    currentRoutine.set = currentRoutine.set + 1;
+    doRoutine();
+}
+
+/*
+
+*/
+function finishedSet(){
+    //check here if we are on the last one.
+    if(inRest){
+        // move the user to the next routine.
+        if(interval){
+            clearInterval(interval);
+            inRest = false;
+            document.getElementById('timerDiv').innerHTML = "00:00";
+            currentRoutine.set = currentRoutine.set + 1;
+            doRoutine();            
+        }
+    }else if(currentRoutine.set === currentRoutine.routine.sets){
+        currentRoutine.set = currentRoutine.set + 1;
+        doRoutine();
+    }else{
+        startTimer(currentRoutine.routine.rest, document.getElementById('timerDiv'));
+    }
+}
+
+/*
+
+*/
+function doRoutine(){
+    //if the set is the set then ... rest and change
+    if(currentRoutine.set <= currentRoutine.routine.sets){
+        document.getElementById('excerciseDiv').innerHTML = 
+            currentRoutine.routine.name + " for " + currentRoutine.routine.repetitions + " repetitions " + currentRoutine.set + " of " + currentRoutine.routine.sets;
+    }else{
+        var restPeriod = currentRoutine.routine.next;
+        currentRoutine.routineCount += 1;
+        if(currentRoutine.routineCount === workout.length){
+            document.getElementById('excerciseDiv').innerHTML = "its done you can collapse";
+        }
+        currentRoutine.routine = workout[currentRoutine.routineCount];
+        currentRoutine.set = 0;
+        startTimer(restPeriod, document.getElementById('timerDiv'));
+        document.getElementById('excerciseDiv').innerHTML = " rest before the next set!!";
+        inRest = true;
+    }
+}
+
+/*
+- need an easy start stop in order to be able to click fast.
+-
+*/
+function startTimer(duration, display) {
+    var timer = duration, minutes, seconds;
+    interval = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            clearInterval(interval);//timer = duration;//resets the timer.
+            currentRoutine.set = currentRoutine.set + 1;
+            doRoutine();
+        }
+    }, 1000);
+}
+
+window.onload = function () {
+    /*var fiveMinutes = 25,
+        display = document.querySelector('#time');
+    startTimer(fiveMinutes, display);*/
+
+   // doWorkout(workout);
+};
+
+
+</script>
+</head>
+<body style="font-size: xx-large;">
+    <div style="font-size: xx-large;" id="time"></div>
+
+<h1>Lafay - LEVEL 2</h1>
+
+<button class="button-class" onclick="doWorkout();">Start Routine</button>
+<button class="button-class" onclick="finishedSet();">Done</button>
+
+<div id="excerciseDiv"></div>
+
+<div id="timerDiv">00:00</div>
+
+
+<table id="progressTable">
+    <tr>
+        <th>Excercise</th>
+        <th>Repetitions</th>
+        <th>Rest</th>
+        <th>Set(s)</th>
+        <th>Done</th>
+    </tr>
+</table>
+
+</body>
+</html>
