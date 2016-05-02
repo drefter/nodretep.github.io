@@ -1,12 +1,15 @@
 <html>
 <head>
 
-<style type="text/css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <link href="lafay.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
-.button-class {
-    height: 100px;
-    width: 100px;
-}
+<style type="text/css">
 
 </style>
 
@@ -195,18 +198,25 @@ window.onload = function () {
 
 </script>
 </head>
-<body style="font-size: xx-large;">
-    <div style="font-size: xx-large;" id="time"></div>
+<body>
 
-<h1>Lafay - LEVEL 2</h1>
-
-<button onclick="doWorkout();">Start Routine</button>
-<button class="button-class" onclick="finishedSet();">Done</button>
-
-<div id="excerciseDiv"></div>
-
-<div id="timerDiv">00:00</div>
-
+<div class="container-fluid">
+    <div class="jumbotron">
+    <div class="row">
+        <div class="col-sm-9"><h1 class="">Lafay - LEVEL 2</h1></div>
+        <div class="col-sm-3"><button class="btn btn-primary" onclick="doWorkout();">Start Routine</button></div>
+    </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12"><button class="btn btn-primary" onclick="finishedSet();">Done</button></div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12" id="excerciseDiv"></div>
+    </div>
+    <div class="row">
+        <div  class="col-sm-12" id="timerDiv">00:00</div>
+    </div>
+</div>
 
 </body>
 </html>
