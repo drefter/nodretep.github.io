@@ -15,7 +15,7 @@
 
 <script>
 
-var restPeriod = 25;
+var restPeriod = 3;
 
 var workout = [
     {
@@ -115,6 +115,7 @@ var interval;
 Starts the whole thing off.
 */
 function doWorkout(){
+    document.getElementById("finishedSetButton").classList.remove("hiddenButton");
     currentRoutine.routine = workout[currentRoutine.routineCount];
     currentRoutine.set = currentRoutine.set + 1;
     doRoutine();
@@ -171,6 +172,7 @@ function doRoutine(){
 function startTimer(duration, display) {
     var timer = duration, minutes, seconds;
     interval = setInterval(function () {
+        document.getElementById("finishedSetButton").disabled = true;
         minutes = parseInt(timer / 60, 10);
         seconds = parseInt(timer % 60, 10);
 
@@ -182,6 +184,7 @@ function startTimer(duration, display) {
         if (--timer < 0) {
             clearInterval(interval);//timer = duration;//resets the timer.
             currentRoutine.set = currentRoutine.set + 1;
+            document.getElementById("finishedSetButton").disabled = false;
             doRoutine();
         }
     }, 1000);
@@ -207,8 +210,8 @@ window.onload = function () {
         <div class="col-sm-3"><button class="btn btn-primary" onclick="doWorkout();">Start Routine</button></div>
     </div>
     </div>
-    <div class="row">
-        <div class="col-sm-12"><button class="btn btn-primary" onclick="finishedSet();">Done</button></div>
+    <div class="container">
+            <button id="finishedSetButton" class="btn btn-primary btn-lg btn-block" onclick="finishedSet();">Done</button>
     </div>
     <div class="row">
         <div class="col-sm-12" id="excerciseDiv"></div>
