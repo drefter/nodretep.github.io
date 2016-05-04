@@ -150,7 +150,10 @@ function doRoutine(){
     //if the set is the set then ... rest and change
     if(currentRoutine.set <= currentRoutine.routine.sets){
         document.getElementById('excerciseDiv').innerHTML = 
-            currentRoutine.routine.name + " for " + currentRoutine.routine.repetitions + " repetitions " + currentRoutine.set + " of " + currentRoutine.routine.sets;
+            currentRoutine.routine.name + " for " + currentRoutine.routine.repetitions + " reps ";
+
+        document.getElementById('setsDiv').innerHTML = 
+             + currentRoutine.set + " of " + currentRoutine.routine.sets + " sets";
     }else{
         var restPeriod = currentRoutine.routine.next;
         currentRoutine.routineCount += 1;
@@ -203,22 +206,48 @@ window.onload = function () {
 </head>
 <body>
 
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">Lafay Timer</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a onclick="doWorkout();" data-toggle="collapse" data-target="#myNavbar">Start Level 2</a></li>
+        <li><a href="#">Level 3 and more todo</a></li>
+        <li><a href="#">Page 3</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
 <div class="container-fluid">
     <div class="jumbotron">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12" id="excerciseDiv"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12" id="setsDiv"></div>
+            </div>
+            <div class="row">
+                <div  class="col-sm-12" id="timerDiv">00:00</div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
-        <div class="col-sm-9"><h1 class="">Lafay - LEVEL 2</h1></div>
-        <div class="col-sm-3"><button class="btn btn-primary" onclick="doWorkout();">Start Routine</button></div>
+            <div class="col-sm-12">
+                <button id="finishedSetButton" class="btn btn-primary btn-lg btn-block" onclick="finishedSet();">Done</button>
+            </div>
     </div>
-    </div>
-    <div class="container">
-            <button id="finishedSetButton" class="btn btn-primary btn-lg btn-block" onclick="finishedSet();">Done</button>
-    </div>
-    <div class="row">
-        <div class="col-sm-12" id="excerciseDiv"></div>
-    </div>
-    <div class="row">
-        <div  class="col-sm-12" id="timerDiv">00:00</div>
-    </div>
+
 </div>
 
 </body>
