@@ -5,6 +5,7 @@ input[type="text"] {
   font-size:32px;
   visibility: visible;
 }
+
 input[type="text"]:focus,
 input[type="text"].focus {
   border: solid 1px #707070;
@@ -32,6 +33,7 @@ input[type="text"].focus {
       font: 20px Montserrat, sans-serif;
       line-height: 1.8;
   }
+  
   p {font-size: 16px;}
   .margin {margin-bottom: 45px;}
   .bg-1 { 

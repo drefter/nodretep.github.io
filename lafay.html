@@ -164,6 +164,9 @@ function doRoutine(){
         currentRoutine.set = 0;
         startTimer(restPeriod, document.getElementById('timerDiv'));
         document.getElementById('excerciseDiv').innerHTML = " rest before the next set!!";
+
+        document.getElementById('setsDiv').innerHTML = "";
+
         inRest = true;
     }
 }
@@ -237,7 +240,7 @@ window.onload = function () {
                 <div class="col-sm-12" id="setsDiv"></div>
             </div>
             <div class="row">
-                <div  class="col-sm-12" id="timerDiv">00:00</div>
+                <div  class="col-sm-12"><p id="timerDiv">00:00</p></div>
             </div>
         </div>
     </div>
