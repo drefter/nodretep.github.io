@@ -16,6 +16,23 @@ input[type="text"].focus {
   visibility: hidden;
 }
 
+.jumbotron p {
+    margin-bottom: 15px;
+    font-size: 55px;
+    text-align: center;
+    padding-top: 45px;
+    color: #235823;
+}
+
+.text-class-excercise {
+  text-align: center;
+  font-weight: xx-large;
+}
+
+.text-class-sets {
+  text-align: center;
+}
+
 .bg-1 { 
     background-color: #1abc9c; /* Green */
     color: #ffffff;
