@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Theme Made By www.w3schools.com - No Copyright -->
+  <title>Bootstrap Theme Simply Me</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <link href="./client/resources/calculator-styles.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script src="parser.js"></script>
+
+  <script type="text/javascript">
+
+    /*
+    - TODO timer doesn't work
+    - how to do algebra type sums where A + 4 = 5
+    - 
+
+    */
+
+    var totalAnswers = 0;
+    var score        = 0;
+
+    var statistics = [];
+    var currentRecord;
+
+    var currentGameType = "";
+
+    //refactor to an object.
+    var equation = 2;//means there are three numbers
+    var min = 0;//decimal
+    var max = 10;//but not more than 20
+    var ops = ['+'];
+
+    var timeSpent = 0;
+
+    //--the different game options--//
+    var SUM         = "SUM";
+    var SUM_HARD    = "SUM_HARD";
+    var SUB         = "SUB";
+    var SUB_HARD    = "SUB_HARD";
+    var MIX         = "MIX";
+    var TABLES_1    = "TABLES_1";
+    var TABLES_2    = "TABLES_2";
+    var ALGEBRA_1   = "ALGEBRA_1";
+    var KATA        = "KATA";
+
+    function options(gameType){
+        //here we set the menu options for the different
+        //types of game you can play.
+        /* optional hide menu
+        document.getElementById('menu').style.visibility = "hidden";
+
+        var list = document.getElementById("ollist");
+
+        if (list.style.display == "none"){
+            list.style.display = "block";
+        }else{
+            list.style.display = "none";
+        }*/
+        currentGameType = gameType;
+        ops = ['+'];
+        if(gameType === SUM){
+            equation = 2;
+            min = 0;
+            max = 20;
+            ops[0] = '+';
+        }else if(gameType === SUM_HARD){
+            equation = 3;
+            min = 0;
+            max = 100;
+            ops[0] = '+';
+        }else if(gameType === SUB){
+            equation = 1;
+            min = 1;
+            max = 20;
+            ops[0] = '-';
+        }else if(gameType === SUB_HARD){
+            equation = 1;
+            min = 0;
+            max = 100;
+            ops[0] = '-';
+        }else if(gameType === MIX){
+            equation = 2;
+            min = 1;
+            max = 50;
+            ops[0] = '+';
+            ops[1] = '-';
+        }else if(gameType === TABLES_1){
+            equation = 1;
+            min = 1;
+            max = 5;
+            ops[0] = '*';
+        }else if(gameType === TABLES_2){
+            equation = 1;
+            min = 1;
+            max = 11;
+            ops[0] = '*';
+        }else if(gameType === ALGEBRA_1){
+            equation = 1;
+            min = 1;
+            max = 11;
+            ops[0] = '+';
+        }else if(gameType === KATA){
+
+        }
+
+
+        window.location.href = '#game';
+        create();
+
+    }
+
+    function myTimer() {
+        timeSpent += 1;
+        document.getElementById("timer").innerHTML = formatTime(timeSpent);
+    }
+
+    function formatTime(milliseconds){
+        return Math.round(timeSpent / 1000) + ":" + Math.round(timeSpent % 1000);
+    }
+
+    function create(){
+        document.getElementById('answer').style.visibility = "visible";
+        //setInterval(myTimer, 1);
+        currentRecord = {};
+        document.getElementById('equation').innerHTML = "";
+        //what if its alebra
+        if(currentGameType === KATA){
+          document.getElementById('equation').innerHTML = generateKataProblem();
+        }else if(currentGameType === ALGEBRA_1){
+          generateFormulae();
+        }else{
+          var opsCount = 0;
+          for(var i = 0; i < equation; i++){
+              var left = generateNumber(min, max);
+              if(i === 0){
+                  //first one is long.
+                  document.getElementById('equation').innerHTML += left;
+              }
+              var op = ops[0];
+              if(ops.length > 1){
+                  if(opsCount === ops.length){
+                      opsCount = 0;
+                  }else{
+                      op = ops[opsCount++];
+                  }
+              }
+              var tmpMax = max;
+              if(op === '-'){
+                  tmpMax = left;
+              }
+              document.getElementById('equation').innerHTML += ' ' + op + ' ' + generateNumber(min, tmpMax);
+          }
+        }
+    }
+
+    /*
+    [1-9] x [1-9]
+    [1-999] x 20
+    [1-999] +/- 9
+    [1-999] +/- 11
+    */
+    function generateKataProblem(){
+      var problem = "";
+      var type = generateNumber(1, 4);
+      if (type === 1) {
+        problem = generateNumber(1, 9) + ' * ' + generateNumber(1, 9);
+      }else if(type === 2){
+        problem = generateNumber(1, 999) + ' * 20';
+      }else if(type === 3){
+        problem = generateNumber(1, 999) + ' ' + (generateNumber(1,2) ? '+' : '-') + ' 9'; 
+      }else if(type === 4){
+        problem = generateNumber(1, 999) + ' ' + (generateNumber(1,2) ? '+' : '-') + ' 11'; 
+      }
+      return problem;
+    }
+
+    /*
+    Generates very simple formulae but we can create more complex ones later.
+    */
+    function generateFormulae(){
+      var expression = "a + " + generateNumber(1, 4) + " = " + generateNumber(5, 12);
+      document.getElementById('equation').innerHTML = expression;
+    }
+
+    //
+    function generateNumber(min, max){
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function answerEvent(oEvent){    
+
+        // Enter key
+        if (oEvent.keyCode !== 13) {
+            // Do nothing as the form submit will handle it
+            // Down arrow key
+            return;
+        }
+
+        var value, answer, success;
+        answer = parseInt(document.getElementById('answer').value);
+        if(currentGameType !== ALGEBRA_1){          
+          value =  eval(document.getElementById('equation').innerHTML);
+          success = answer === value;
+        }else{
+          success = checkExpression(document.getElementById('equation').innerHTML, answer);
+        }
+        //now we wait for the right answer, keep the score and move on if the answer is right.
+        totalAnswers += 1;
+
+        if(success){
+            document.getElementById('message').innerHTML 
+                = answer + " is correct, and you took: " + formatTime(timeSpent) + " seconds well done and try another";
+
+            document.getElementById('answer').value = "";
+            
+            currentRecord.timeSpent = timeSpent;
+            currentRecord.equation = document.getElementById('equation').innerHTML;
+
+            statistics.push(currentRecord);
+
+            timeSpent = 0;
+            score += 1;
+            setMessage();
+
+            create();
+
+        }else{
+            if(currentRecord.errors === undefined){
+                currentRecord.errors = 0;
+            }
+
+            document.getElementById('message').innerHTML = answer + " is wrong, try again ... ";
+            document.getElementById('answer').value = "";
+            setMessage();
+            currentRecord.errors += 1;
+        }
+    }
+
+    function setMessage(){               
+        document.getElementById('status').innerHTML = 
+            "You have answered " + totalAnswers + " questions with " + score + " correct answers";
+    }
+
+    function generateGameOptions(){
+      var games = [
+        {param:'SUM', name:'simple addition'},
+        {param:'SUM', name:'Addition simple'},
+        {param:'SUB', name:'subtraction simple'},
+        {param:'SUM_HARD', name:'Addition hard'},
+        {param:'SUB_HARD', name:'subtraction hard'},
+        {param:'MIX', name:'Mixture'},
+        {param:'TABLES_1', name:'Multiplication Tables (0 to 5)'},
+        {param:'TABLES_2', name:'Multiplication Tables (0 to 10)'},
+        {param:'ALGEBRA_1', name:'Simple Algebra: a + 5 = 9'},
+        {param:'KATA', name:'Ludos Dilemna'}
+        ];
+
+        var parent = document.getElementById('gameTypeDiv');
+//<button type="button" class="btn btn-primary" onclick="options('SUB_HARD')">subtraction hard</button>
+        for (var i = 0; i < games.length; i++) {
+          var element = document.createElement('button');
+          element.appendChild(document.createTextNode(games[i].name));
+          element.setAttribute("class", "btn btn-primary");
+          element.setAttribute("type", "button");
+          element.setAttribute("onclick", "options('" + games[i].param + "')");
+          document.getElementById('gameTypeDiv').appendChild(element);
+        };
+
+    }
+
+var tests = [
+  {expression:"a + 4 = 8", guess:4, good:true},
+  {expression:"a - 4 = 4", guess:8, good:true},
+  {expression:"a + 4 = 8", guess:5, good:false},
+  {expression:"a - 4 = 12", guess:4, good:false},
+];
+
+for (var i = 0; i < tests.length; i++) {
+  checkExpression(tests[i].expression, tests[i].guess);
+}
+
+  function checkExpression(expression, guess){
+    var parts = PARSER.parse(expression);
+    //its an array so get the parts, replace the term and create a string.
+    //get the answer and run the eval on the rest ...
+    var answer, variable, operator, value;//we replace one with the other
+    for (var i = 0; i < parts.length; i++) {
+      var part = parts[i];
+      //answer is last
+      if(isObject(part)){
+        if(part.var){
+          variable = part.var;
+        }else if(part.operator){
+          operator = part.operator;
+        }else if(part.answer){
+          answer = part.answer;
+        }
+      }else{
+        //its just a value
+        value = part;
+      }
+    }
+    //create the expression and test it.
+    var calculation = guess + ' ' + operator + ' ' + value;
+    console.log("calculation is " + calculation + " = " + eval(calculation));
+    if(answer === eval(calculation)){
+      console.log("correct");
+      return true;
+    }else{
+      console.log("incorrect");
+      return false;
+    }
+
+
+  }
+
+  function isObject(val) {
+    if (val === null) { return false;}
+    return ( (typeof val === 'function') || (typeof val === 'object') );
+  }
+
+  </script>
+
+</head>
+<body onload='generateGameOptions()'>
+
+<!-- Navbar -->
+<nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">Count Potato</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#WHO">What?</a></li>
+        <li><a href="#HOW">How?</a></li>
+        <li><a href="#WHERE">Start!</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- First Container -->
+<div id="WHO" class="container-fluid bg-1 text-center">
+  <h3>What is this place?</h3>
+  <p>Its just a simple game to help you solve some simple sums.</p>
+</div>
+
+<!-- Second Container -->
+<div class="container-fluid bg-2 text-center">
+  <h3 id="HOW" class="margin">How to play? </h3>
+  <p>Just select the type of sum you want and then the game will start below.</p>
+    <h2 class="" type="button" id="menu1" data-toggle="dropdown">Game Type</h2>
+    <div id='gameTypeDiv'>
+
+    </div>
+</div>
+
+<!-- Third Container (Grid) -->
+<div id="game" class="container-fluid bg-3">    
+<!--    <div class="row">
+      <h2 class='col-sm-4' id='timerHeader'>Timer:</h2>
+      <h2 class='col-sm-8' id='timer'>0:00</h2>
+    </div> -->
+    <div class="row">
+      <div class="col-sm-4 equation"><h1 id="equation">Sums go here</h1></div>
+      <div class="col-sm-8 answer-class" id="answer-div">
+          <input class="style-1" id="answer" type='text' onkeyup="answerEvent(event)"></input>
+      </div>
+    </div>
+    <p id="message"></p>
+    <p id="score"></p>
+    <p id="status"></p>
+</div>
+
+<!-- Footer -->
+<footer class="container-fluid bg-4 text-center">
+  <p>Bootstrap Theme Made By <a href="http://www.w3schools.com">www.w3schools.com</a></p> 
+</footer>
+
+</body>
+</html>
