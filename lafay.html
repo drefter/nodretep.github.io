@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
   <link href="lafay.css" rel="stylesheet">
+  <link href="level-2.json">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
@@ -15,7 +16,19 @@
 
 <script>
 
-var restPeriod = 2;
+var restPeriod = 25;
+
+var debugging = false;
+
+function setDebugger(){
+    if(debugging){
+        debugging = false;
+        document.getElementById('set-debugger').innerHTML = "Start Debugging";
+    }else{
+        debugging = true;
+        document.getElementById('set-debugger').innerHTML = "Stop Debugging";
+    }
+}
 
 /*
 The workout model goes here:
@@ -105,24 +118,45 @@ var workout = [
     }
 ];
 
+//holds the current routine being used.
 var currentRoutine = {
     routineCount: 0,
     routine: {},
-    set: 0,
+    set: 1,
 };
 
 var inRest = false;
 
 var interval;
 
+
+
 /*
 Starts the whole thing off.
 */
-function doWorkout(){
+function doWorkout(index){
+    clearInterval(interval);
+    inRest = false;
+    document.getElementById('timerDiv').innerHTML = "00:00";
+    interval = null;
+    document.getElementById("finishedSetButton").disabled = false;
+
+    var i = index ? index : 0;
     document.getElementById("finishedSetButton").classList.remove("hiddenButton");
-    currentRoutine.routine = workout[currentRoutine.routineCount];
-    currentRoutine.set = currentRoutine.set + 1;
+    currentRoutine.routine = workout[i];
     doRoutine();
+}
+
+function createSetItem(routine, position){
+    //<li><a href="#">Dips</a></li>
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    li.appendChild(a);
+    a.innerHTML = routine.name;
+    a.setAttribute("onclick", "doWorkout('" + position + "');");
+    a.setAttribute("data-target", ".navbar-collapse");
+    a.setAttribute("data-toggle", "collapse");
+    return li;
 }
 
 /*
@@ -143,7 +177,9 @@ function finishedSet(){
         currentRoutine.set = currentRoutine.set + 1;
         doRoutine();
     }else{
-        startTimer(currentRoutine.routine.rest, document.getElementById('timerDiv'));
+        //starts the timer here.
+        var rest = debugging ? 3 : currentRoutine.routine.rest;
+        startTimer(rest, document.getElementById('timerDiv'));
     }
 }
 
@@ -159,7 +195,7 @@ function doRoutine(){
         document.getElementById('setsDiv').innerHTML = 
              + currentRoutine.set + " of " + currentRoutine.routine.sets + " sets";
     }else{
-        var restPeriod = currentRoutine.routine.next;
+        var restPeriod = debugging ? 3 : currentRoutine.routine.next;
         currentRoutine.routineCount += 1;
         if(currentRoutine.routineCount === workout.length){
             document.getElementById('excerciseDiv').innerHTML = "its done you can collapse";
@@ -168,9 +204,7 @@ function doRoutine(){
         currentRoutine.set = 0;
         startTimer(restPeriod, document.getElementById('timerDiv'));
         document.getElementById('excerciseDiv').innerHTML = " rest before the next set!!";
-
         document.getElementById('setsDiv').innerHTML = "";
-
         inRest = true;
     }
 }
@@ -201,11 +235,9 @@ function startTimer(duration, display) {
 }
 
 window.onload = function () {
-    /*var fiveMinutes = 25,
-        display = document.querySelector('#time');
-    startTimer(fiveMinutes, display);*/
-
-   // doWorkout(workout);
+    for (var i = 0; i < workout.length; i++) {
+        document.getElementById("levelDropdown").appendChild(createSetItem(workout[i], i));
+    };
 };
 
 
@@ -225,10 +257,15 @@ window.onload = function () {
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Home</a></li>
-        <li><a onclick="doWorkout();" data-toggle="collapse" data-target="#myNavbar">Start Level 2</a></li>
-        <li><a href="#">Level 3 and more todo</a></li>
-        <li><a href="#">Page 3</a></li>
+        <li class="active"><a onclick="setDebugger();" id="set-debugger">Start Debugging</a></li>
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Level 2 <span class="caret"></span></a>
+            <ul class="dropdown-menu" id="levelDropdown">
+            </ul>
+        </li>
+        <li><a href="#">25 Second Timer</a></li>
+        <li><a href="#">90 Second Timer</a></li>
+        <li><a href="#">3 Minute Timer</a></li>
       </ul>
     </div>
   </div>
