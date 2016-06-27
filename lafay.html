@@ -230,6 +230,7 @@ function startTimer(duration, display) {
             currentRoutine.set = currentRoutine.set + 1;
             document.getElementById("finishedSetButton").disabled = false;
             doRoutine();
+            inRest = false;
         }
     }, 1000);
 }
