@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="./tp/d3.min.js"></script>
+    <script src="./tp/underscore.1.8.3.js"></script>
+
+    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0" />
+
+    <style>
+
+    .title {
+      padding: 10px;
+      text-align: center;
+      font-size: xx-large;
+    }
+
+    .timeLeft {
+      padding: 5px;
+      text-align: center;
+      font-size: large;
+    }
+
+     text {
+        fill: 'black';
+        font-family: 'Arial';
+        font-weight: bold;
+        font-size: 28px;
+      }
+
+      .blue{
+        background-color: blue;
+      }
+
+       .red{
+        background-color: red;
+      }
+
+       .green{
+        background-color: green;
+      }
+
+       .yellow{
+        background-color: yellow;
+      }
+
+      body {
+        background-color: #e7e8d1
+      }
+
+      .textAlignment {
+        vertical-align: middle;
+        display: table-cell;
+        font-size: xx-large;
+        width: 100%;
+        text-align: center;
+      }
+
+      .buttons{
+        vertical-align: middle;
+        display: table-cell;
+        font-size: xx-large;
+        
+        text-align: center;
+        width:450px;
+      }
+
+      .button {
+        background-color: #000000;
+        color: #FFFFFF;
+        padding: 10px;
+        border-radius: 10px;
+        -moz-border-radius: 10px;
+        -webkit-border-radius: 10px;
+        margin:10px
+      }
+    
+      .small-btn {
+        width: 50px;
+        height: 25px;
+      }
+      
+      .medium-btn {
+        width: 70px;
+        height: 30px;
+      }
+      
+      .big-btn {
+        width: 90px;
+        height: 40px;
+        font-size: large;
+      }
+
+    </style>
+
+  </head>
+
+  <body onload="start()">
+
+  <div class="title" id="message">Which Color?</div>
+  <div class="timeLeft" id="timer"></div>
+  <div id="content"></div>
+  <div class="buttons" id="buttons"></div>    
+
+
+  </body>
+</html>
+
+<script type="text/javascript">
+
+/*
+TODO a timer to get to the next level
+TODO a timer to count how long you took
+TODO increase difficulty e.g you play for 10 levels and it gets harder
+
+Size
+colors
+Shapes
+
+TODO size of the screen needs to change so that I can get it onto a mobile device.
+
+*/
+
+var symbols = ["circle", "square", "cross", "diamond", "triangle-down", "triangle-up"];
+var rgb     = ['blue', 'orange', 'red', 'yellow', 'brown'];
+var table   = [];
+
+var width = 450;
+var height = 450;
+var divSizeStyle = "height:" + height + "px; width:" + width + "px;";
+
+var restartTimer;
+var counter;
+var div;
+var messageSpan;
+var restartSpan;
+
+var score = 0;
+
+var globalTimer;
+var gameTime = 60;
+var gameOver = false;
+
+var complexity      = 1;
+var colorComplexity = 2;
+var shapeComplexity = 1;
+var upsize          = 0;
+var sizeComplexity  = [3, 5, 7, 9, 11, 13];
+//var sizeComplexity  = [4, 6, 8, 10, 12];
+var shapeSize       = [1200, 1000, 1000, 500, 400, 300];
+
+/*
+Stops and starts the game when you are done.
+*/
+var countdown = function(){
+  globalTimer = setInterval(function(){
+    document.getElementById("timer").innerHTML = gameTime--;
+    if(gameTime === 0){
+      console.log("stop ... get the total score etc etc");
+      d3.select("#content").html("");
+
+      var finalScoreDiv = d3.select("#content").append("div")
+        .attr("width", 450)
+        .attr("height", 450)
+        .attr("class", "textAlignment")
+        .attr('style', divSizeStyle);
+
+      gameOver = true;
+      finalScoreDiv.text("you scored: " + score + " ");
+      clearInterval(globalTimer);
+    }
+  }, 1000);
+}
+
+/*
+just groups the starting functions
+*/
+function start(){
+  gameOver = false;
+  document.getElementById("timer").innerHTML = gameTime;
+  countdown();
+  testAllSymbols();
+}
+
+/*
+Core game setup function that needs to be renamed.
+*/
+function testAllSymbols(){
+  //always clear the content first
+  d3.select("#content").html("");
+
+  var svg = d3.select("#content").append("svg")
+   // .attr("style", "width:100%;height:100%;")
+    .attr("id", "svgContent")
+    .attr("width", width)
+    .attr("height", height);
+
+  //Create the grid here.
+  random(svg, sizeComplexity[upsize]);
+
+  var div = d3.select("#buttons");
+  //if 1 then color then shape 
+  var buttonColors = rgb.slice(0, colorComplexity);
+  for (var i = 0; i < buttonColors.length; i++) {
+    div.append('button')
+      .attr('myColor', buttonColors[i])
+      .attr("class", "button big-btn")
+      .on('click', function(d){
+          //TODO check timer is not null
+          pick(this.style["background-color"]);
+      })
+      .style('background-color', buttonColors[i])
+      .text(buttonColors[i]);
+  }
+  
+}
+
+function getHighestValue(){
+
+}
+
+/*
+Win or lose in 3 seconds you get another go.
+*/
+function pick(color){
+  //TODO the table here is too 
+  var colors = _.countBy(table, function(d){
+    return d.color;
+  });
+
+  var won = true;
+  var value = colors[color];
+  var highest;
+  for (var key in colors) {
+    if(colors[key] > value){
+      won = false;
+      highest = key;
+    } 
+  }
+
+  var message = d3.select("#message");
+
+  d3.select("#content").html("");
+
+  div = d3.select("#content").append("div")
+      .attr("width", 450)
+      .attr("height", 450)
+      .attr("class", "textAlignment")
+      .attr('style', divSizeStyle);
+
+  messageSpan = div.append("span")
+    .attr("class", "textAlignment")
+    .attr("id", "messageSpan");
+
+  div.append("br")
+
+  var span = div.append("span")
+    .attr("class", "textAlignment")
+    .attr("id", "scoreSpan");
+
+  div.append("br")
+
+  restartSpan = div.append("span")
+    .attr("class", "textAlignment")
+    .attr("id", "restartSpan");
+
+  d3.select("#buttons").html("");//remove the buttons
+
+  counter = 1;
+  restartTimer = setInterval(restarter, 1000);
+
+  if(won){
+      messageSpan.text("yay you picked " + color + " its the highest at " + value)  
+      score++; 
+        
+  }else{
+      messageSpan.text("loser you picked " + color + " but the highest was " + highest)
+  }
+
+  span.text("Your score is: " + score);
+  complexity += 1;
+  if(upsize < sizeComplexity.length - 1){
+    upsize = complexity % 3 === 0 ? upsize += 1 : upsize;
+  }else{
+    console.log("size complexity is maxed try something else now.")
+  }
+}
+
+/*
+the countdown between levels
+*/
+var restarter = function(){  
+  if(counter > 0){
+    restartSpan.text("Get ready");
+    counter--;
+  }else{
+    clearInterval(restartTimer);
+    if(!gameOver){
+      testAllSymbols();
+    }
+  }
+}
+
+/*
+Draws a grid of colored shapes based on the set of shapes and colors.
+*/
+function random(svg, size, color){
+  var step = width / (size + 1);
+  var x = 20;
+  var y = 20;
+  table = [];//clear the previous round. 
+  //TODO should I save the data of all the 
+  for (var i = 0; i < sizeComplexity[upsize]; i++) {
+    for (var j = 0; j < sizeComplexity[upsize]; j++) {
+        var shape = randomArrayItem(symbols.slice(0, shapeComplexity));
+        var color = randomArrayItem(rgb.slice(0, colorComplexity));
+        table.push(
+            { 
+              'shape': shape,
+              'color': color
+            }
+          );
+        drawShape(shape, svg, x, y, color);
+        y += step;
+    } 
+    y = 20;
+    x += step
+  }
+}
+
+function randomArrayItem(items){
+  return items[randomIntFromInterval(0, items.length - 1)]
+}
+
+function randomIntFromInterval(min, max){
+    return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+function drawShape(shape, svg, x, y, color){
+  svg.append('path')
+    .attr("d", d3.svg.symbol().type(shape).size(shapeSize[upsize]))
+    .attr("transform", function(d) { return "translate(" + x + "," + y + ")"; })
+    .style("fill", color ? color : "red");
+}
+
+
+</script>
