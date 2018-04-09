@@ -44,7 +44,7 @@
       }
 
       body {
-        background-color: #e7e8d1
+        background-color: white;
       }
 
       .textAlignment {
@@ -68,10 +68,11 @@
         background-color: #000000;
         color: #FFFFFF;
         padding: 10px;
-        border-radius: 10px;
+        //border-radius: 10px;
         -moz-border-radius: 10px;
         -webkit-border-radius: 10px;
         margin:10px
+        border-radius: 50%;
       }
     
       .small-btn {
@@ -86,7 +87,8 @@
       
       .big-btn {
         width: 90px;
-        height: 40px;
+        height: 90px;
+        border-radius: 50%; 
         font-size: large;
       }
 
@@ -126,8 +128,14 @@ TODO size of the screen needs to change so that I can get it onto a mobile devic
 
 */
 
-var symbols = ["circle", "square", "cross", "diamond", "triangle-down", "triangle-up"];
-var rgb     = ['blue', 'orange', 'red', 'yellow', 'brown'];
+var palettes = {
+  "teye": ["white", "#98dafc", "#daad86", "#312c32"],
+  "material": ["#303F9F", "#CDDC39", "#FF5722", "#312c32"]
+};
+
+var symbols = ["circle", "square", "triangle-down", "diamond", "triangle-up", "cross"];
+var rgb     = palettes.material;
+//['blue', 'orange', 'red', 'yellow', 'brown'];
 var table   = [];
 
 var width = 450;
@@ -236,7 +244,7 @@ function testAllSymbols(){
           pick(this.style["background-color"]);
       })
       .style('background-color', buttonColors[i])
-      .text(buttonColors[i]);
+      //.text(buttonColors[i]);
   }
   
 }
@@ -266,9 +274,10 @@ function pick(color){
 
   var message = d3.select("#message");
 
-  d3.select("#content").html("");
+  //d3.select("#content").html("");
 
-  div = d3.select("#content").append("svg")
+  div = d3.select("svg")
+    //select("#content").append("svg")
       .attr("width", width)
       .attr("height", height)
       .attr("class", "textAlignment")
@@ -277,7 +286,7 @@ function pick(color){
 
    messageSpan = div.append("text")
       .attr("x", textX)
-      .attr("y", 50)
+      .attr("y", 100)
       .attr("text-anchor", "middle")
 
   span = div.append("text")
