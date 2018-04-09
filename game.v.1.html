@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="./tp/d3.min.js"></script>
-    <script src="./tp/underscore.1.8.3.js"></script>
+    <script src="http://d3js.org/d3.v2.min.js"></script>
+    <script src="underscore-min.js"></script>
 
     <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0" />
 
@@ -90,6 +90,12 @@
         font-size: large;
       }
 
+      .bigger-btn {
+        width: 130px;
+        height: 40px;
+        font-size: large;
+      }
+
     </style>
 
   </head>
@@ -137,16 +143,20 @@ var restartSpan;
 var score = 0;
 
 var globalTimer;
-var gameTime = 60;
+var duration = 60;
+var gameTime = duration;
 var gameOver = false;
 
 var complexity      = 1;
+var complexityCount = 0;
 var colorComplexity = 2;
 var shapeComplexity = 1;
 var upsize          = 0;
-var sizeComplexity  = [3, 5, 7, 9, 11, 13];
-//var sizeComplexity  = [4, 6, 8, 10, 12];
-var shapeSize       = [1200, 1000, 1000, 500, 400, 300];
+
+//go up one by one and add a color when its even
+var sizeComplexity      = [3, 5, 7, 9, 11];
+var sizeComplexityEven  = [4, 6, 8, 10, 12];
+var shapeSize           = [2000, 1000, 1000, 500, 400];
 
 /*
 Stops and starts the game when you are done.
@@ -155,6 +165,8 @@ var countdown = function(){
   globalTimer = setInterval(function(){
     document.getElementById("timer").innerHTML = gameTime--;
     if(gameTime === 0){
+      clearInterval(restartTimer);
+      d3.select("#buttons").html("");
       console.log("stop ... get the total score etc etc");
       d3.select("#content").html("");
 
@@ -165,8 +177,17 @@ var countdown = function(){
         .attr('style', divSizeStyle);
 
       gameOver = true;
-      finalScoreDiv.text("you scored: " + score + " ");
+      finalScoreDiv.text("Score: " + score + " ");
       clearInterval(globalTimer);
+
+      d3.select("#buttons").append('button')
+        .attr("class", "button bigger-btn")
+        .on('click', function(d){
+          start();
+        })
+        //.style('background-color', buttonColors[i])
+        .text("Play Again");
+
     }
   }, 1000);
 }
@@ -175,6 +196,12 @@ var countdown = function(){
 just groups the starting functions
 */
 function start(){
+  score = 0;
+  d3.select("#buttons").html("");
+  gameTime = duration;
+  complexity = 1;
+  complexityCount = 0;
+  upsize = 0;
   gameOver = false;
   document.getElementById("timer").innerHTML = gameTime;
   countdown();
@@ -241,27 +268,27 @@ function pick(color){
 
   d3.select("#content").html("");
 
-  div = d3.select("#content").append("div")
-      .attr("width", 450)
-      .attr("height", 450)
+  div = d3.select("#content").append("svg")
+      .attr("width", width)
+      .attr("height", height)
       .attr("class", "textAlignment")
-      .attr('style', divSizeStyle);
+     
+  var textX = 180;
 
-  messageSpan = div.append("span")
-    .attr("class", "textAlignment")
-    .attr("id", "messageSpan");
+   messageSpan = div.append("text")
+      .attr("x", textX)
+      .attr("y", 50)
+      .attr("text-anchor", "middle")
 
-  div.append("br")
+  span = div.append("text")
+      .attr("x", textX)
+      .attr("y", 150)
+      .attr("text-anchor", "middle")
 
-  var span = div.append("span")
-    .attr("class", "textAlignment")
-    .attr("id", "scoreSpan");
-
-  div.append("br")
-
-  restartSpan = div.append("span")
-    .attr("class", "textAlignment")
-    .attr("id", "restartSpan");
+  restartSpan = div.append("text")
+      .attr("x", textX)
+      .attr("y", 250)
+      .attr("text-anchor", "middle")
 
   d3.select("#buttons").html("");//remove the buttons
 
@@ -269,20 +296,35 @@ function pick(color){
   restartTimer = setInterval(restarter, 1000);
 
   if(won){
-      messageSpan.text("yay you picked " + color + " its the highest at " + value)  
+      messageSpan.text("CORRECT")  
       score++; 
         
   }else{
-      messageSpan.text("loser you picked " + color + " but the highest was " + highest)
+      messageSpan.text("WRONG")
   }
 
   span.text("Your score is: " + score);
   complexity += 1;
-  if(upsize < sizeComplexity.length - 1){
+  //how to well up the complexity. 
+  //every time you divide by 3 change on factor
+  if(complexity % 1 === 0){
+    //this is too aggressive
+    //var randomChange = randomIntFromInterval(0, 2);
+    complexityCount += 1;
+    if(complexityCount === 1){
+      upsize += 1;
+    }else if(complexityCount === 3){
+      colorComplexity += 1;
+      complexityCount = 0;
+    }else if(complexityCount === 2){
+      shapeComplexity += 1;
+    }
+  }
+/*  if(upsize < sizeComplexity.length - 1){
     upsize = complexity % 3 === 0 ? upsize += 1 : upsize;
   }else{
     console.log("size complexity is maxed try something else now.")
-  }
+  }*/
 }
 
 /*
@@ -304,9 +346,19 @@ var restarter = function(){
 Draws a grid of colored shapes based on the set of shapes and colors.
 */
 function random(svg, size, color){
-  var step = width / (size + 1);
-  var x = 20;
-  var y = 20;
+  var divider = size;
+  if(size === 3){
+    divider = size + 2;
+  }else if(size === 5){
+    divider = size + 1;
+  }else if(size === 11){
+    divider = size + 3;
+  }else{
+    divider = size + 2;
+  }
+  var step = width / divider;
+  var x = (size > 3 ? 20 : 80);
+  var y = (size > 3 ? 20 : 80);
   table = [];//clear the previous round. 
   //TODO should I save the data of all the 
   for (var i = 0; i < sizeComplexity[upsize]; i++) {
@@ -322,7 +374,7 @@ function random(svg, size, color){
         drawShape(shape, svg, x, y, color);
         y += step;
     } 
-    y = 20;
+    y = (size > 3 ? 20 : 80);
     x += step
   }
 }
