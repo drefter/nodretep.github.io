@@ -8,6 +8,10 @@
 
     <style>
 
+    .spot{
+
+    }
+
     .title {
       padding: 10px;
       text-align: center;
@@ -237,11 +241,11 @@ function testAllSymbols(){
   var buttonColors = rgb.slice(0, colorComplexity);
   for (var i = 0; i < buttonColors.length; i++) {
     div.append('button')
-      .attr('myColor', buttonColors[i])
+      .attr('mycolor', buttonColors[i])
       .attr("class", "button big-btn")
       .on('click', function(d){
           //TODO check timer is not null
-          pick(this.style["background-color"]);
+          pick(this.getAttribute("mycolor"));//this.style["background-color"]);
       })
       .style('background-color', buttonColors[i])
       //.text(buttonColors[i]);
@@ -264,17 +268,32 @@ function pick(color){
 
   var won = true;
   var value = colors[color];
-  var highest;
+  var highest = "";
+
   for (var key in colors) {
     if(colors[key] > value){
       won = false;
+      highest = key;
+    }else{
+      won = true;
       highest = key;
     } 
   }
 
   var message = d3.select("#message");
 
-  //d3.select("#content").html("");
+  restartTimer = setInterval(restarter, 1000);
+
+  //how can I differentiate the two styles?
+  d3.selectAll(".spot").
+    each(function(d, i){
+      if(d3.select(this)[0][0].getAttribute("spotColor") === highest){
+        d3.select(this).style("opacity", 0.6);  
+      }else{
+        d3.select(this).style("opacity", 0.1);  
+      }
+      
+    });
 
   div = d3.select("svg")
     //select("#content").append("svg")
@@ -302,7 +321,6 @@ function pick(color){
   d3.select("#buttons").html("");//remove the buttons
 
   counter = 1;
-  restartTimer = setInterval(restarter, 1000);
 
   if(won){
       messageSpan.text("CORRECT")  
@@ -400,7 +418,10 @@ function drawShape(shape, svg, x, y, color){
   svg.append('path')
     .attr("d", d3.svg.symbol().type(shape).size(shapeSize[upsize]))
     .attr("transform", function(d) { return "translate(" + x + "," + y + ")"; })
-    .style("fill", color ? color : "red");
+    .attr("class", "spot")
+    .attr("spotColor", color)
+    .style("fill", color ? color : "red")
+    .style("opacity", 1.0);
 }
 
 
